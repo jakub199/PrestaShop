@@ -1,0 +1,5 @@
+admin_system_information:
+    path: system_information
+    methods: [GET]
+    defaults:
+        _controller: 'PrestaShopBundle\Controller\Admin\AdvancedParameters\SystemInformationController::indexAction'
