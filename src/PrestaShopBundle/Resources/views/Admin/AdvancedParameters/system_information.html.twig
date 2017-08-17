@@ -77,7 +77,7 @@
             </h3>
             <p>{{ 'This information must be provided when you report an issue on our bug tracker or forum.'|trans({}, 'Admin.Advparameters.Feature') }}</p>
         </div>
-        {% if hostMode %}
+        {% if false == hostMode %}
         <div class="panel">
             <h3>
                 <i class="icon-info"></i>
@@ -209,7 +209,7 @@
             <p>
                 <strong><i class="icon-info"></i>
                     {{ 'Required parameters:'|trans({}, 'Admin.Advparameters.Feature') }}</strong>
-            {% if failRequired %}
+            {% if failRequired == false %}
                 <span class="text-success">{{ 'Ok'|trans({}, 'Admin.Advparameters.Notification') }}</span>
             </p>
             {% else %}
@@ -217,13 +217,13 @@
             </p>
             <ul>
                 {% for key, value in testsRequired %}
-                    {% if 'fail' == value and testErrors.key is defined %}
-                        <li>{{ testErrors.key }}</li>
+                    {% if 'fail' == value and testsErrors[key] is defined %}
+                        <li>{{ testsErrors[key] }}</li>
                     {% endif %}
                 {% endfor %}
             </ul>
             {% endif %}
-            {% if failOptional is defined %}
+            {% if failOptional == false %}
             <p>
                 <strong>{{ 'Optional parameters:'|trans({}, 'Admin.Advparameters.Feature') }}</strong>
                 {% if failOptional is defined %}
@@ -234,8 +234,8 @@
                 </p>
                 <ul>
                     {% for key, value in testsOptional %}
-                        {% if 'fail' == value and testErrors.key is defined %}
-                            <li>{{ testErrors.key }}</li>
+                        {% if 'fail' == value and testsErrors[key] is defined %}
+                            <li>{{ testsErrors[key] }}</li>
                         {% endif %}
                     {% endfor %}
                 </ul>

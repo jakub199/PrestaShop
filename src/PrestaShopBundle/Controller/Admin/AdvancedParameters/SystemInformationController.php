@@ -63,6 +63,43 @@ class SystemInformationController extends FrameworkBundleAdminController
         return $this->render('PrestaShopBundle:Admin/AdvancedParameters:system_information.html.twig', array_merge($twigValues, $summary));
     }
 
+    public function displayAjaxCheckFilesAction()
+    {
+        $xml = @simplexml_load_file(_PS_API_URL_.'/xml/md5/'._PS_VERSION_.'.xml');
+        if (!$xml) {
+            die(json_encode($this->file_list));
+        }
+
+        $this->getListOfUpdatedFiles($xml->ps_root_dir[0]);
+        die(json_encode($this->file_list));
+    }
+
+    public function getListOfUpdatedFiles(SimpleXMLElement $dir, $path = '')
+    {
+        $exclude_regexp = '(install(-dev|-new)?|themes|tools|cache|docs|download|img|localization|log|mails|translations|upload|modules|override/(:?.*)index.php$)';
+        $admin_dir = basename(_PS_ADMIN_DIR_);
+
+        foreach ($dir->md5file as $file) {
+            $filename = preg_replace('#^admin/#', $admin_dir.'/', $path.$file['name']);
+            if (preg_match('#^'.$exclude_regexp.'#', $filename)) {
+                continue;
+            }
+
+            if (!file_exists(_PS_ROOT_DIR_.'/'.$filename)) {
+                $this->file_list['missing'][] = $filename;
+            } else {
+                $md5_local = md5_file(_PS_ROOT_DIR_.'/'.$filename);
+                if ($md5_local != (string)$file) {
+                    $this->file_list['updated'][] = $filename;
+                }
+            }
+        }
+
+        foreach ($dir->dir as $subdir) {
+            $this->getListOfUpdatedFiles($subdir, $path.$subdir['name'].'/');
+        }
+    }
+
     private function getHosting()
     {
         return $this->get('prestashop.adapter.hosting_information');
